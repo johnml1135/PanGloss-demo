@@ -1,0 +1,14 @@
+{
+  "name": "pangloss-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "convert": "node tools/convert-fwbackups.mjs",
+    "build:wasm": "node tools/build-wasm.mjs",
+    "serve": "node tools/serve.mjs",
+    "dev": "npm run convert && npm run build:wasm && npm run serve"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.6.0"
+  }
+}
