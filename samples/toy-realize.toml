@@ -1,0 +1,5 @@
+# Sidecar for samples/toy-hc.xml (hc_realize::RealizeMap format -- see hc-realize/src/map.rs).
+# Maps this toy grammar's own affix glosses to hc_realize's typed feature vocabulary so
+# TableRealizer can render a natural English phrase, not just the raw Leipzig gloss.
+[features]
+"pl" = "Num:Pl"

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PanGloss Demo</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+  <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/border.css" />
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <!-- Must precede Alpine's own script tag: both `type="module"` and classic `defer` scripts run
+       in document order after parsing, so this registers the `pangloss` component (and attaches
+       the `alpine:init` listener) before Alpine's script fires that event and calls start(). -->
+  <script type="module">
+    import pangloss from "./src/app.js";
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("pangloss", pangloss);
+    });
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="h-full bg-slate-50 text-slate-900" x-data="pangloss()" x-init="init()">
+
+  <header class="border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
+    <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-3">
+      <h1 class="mr-4 text-xl font-semibold tracking-tight text-slate-800">PanGloss</h1>
+
+      <select
+        x-model="selectedGrammarId"
+        @change="onGrammarChange()"
+        class="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm"
+      >
+        <template x-for="g in grammars" :key="g.id">
+          <option
+            :value="g.id"
+            x-text="g.displayName + (g.source === 'sample' ? ' (sample)' : '')"
+          ></option>
+        </template>
+      </select>
+
+      <select
+        x-show="translations.length > 0"
+        x-model="selectedTranslationId"
+        @change="onTranslationChange()"
+        class="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm"
+      >
+        <template x-for="t in translations" :key="t.id">
+          <option :value="t.id" x-text="t.name"></option>
+        </template>
+      </select>
+
+      <select
+        x-show="books.length > 0"
+        x-model="selectedBookId"
+        @change="onBookChange()"
+        class="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm"
+      >
+        <template x-for="b in books" :key="b.id">
+          <option :value="b.id" x-text="b.name"></option>
+        </template>
+      </select>
+
+      <select
+        x-show="books.length > 0"
+        x-model.number="chapter"
+        @change="loadChapter()"
+        class="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm"
+      >
+        <template x-for="n in maxChapter" :key="n">
+          <option :value="n" x-text="n"></option>
+        </template>
+      </select>
+
+      <div class="ml-auto flex overflow-hidden rounded-md border border-slate-300">
+        <button
+          @click="setMode('view')"
+          class="px-3 py-1.5 text-sm font-medium"
+          :class="mode === 'view' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100'"
+        >View</button>
+        <button
+          @click="setMode('edit')"
+          class="border-l border-slate-300 px-3 py-1.5 text-sm font-medium"
+          :class="mode === 'edit' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-100'"
+        >Edit</button>
+      </div>
+    </div>
+
+    <div class="mx-auto mt-2 max-w-5xl text-xs" x-show="grammarStatus || ebibleStatus">
+      <p x-show="grammarStatus" x-text="grammarStatus" class="text-rose-600"></p>
+      <p x-show="ebibleStatus" x-text="ebibleStatus" class="text-amber-600"></p>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-5xl px-6 py-8">
+
+    <!-- Edit mode: raw editable text, fed to analysis when switching back to View. -->
+    <div x-show="mode === 'edit'">
+      <textarea
+        x-model="chapterText"
+        rows="16"
+        class="w-full rounded-lg border border-slate-300 bg-white p-4 font-mono text-sm leading-relaxed shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+        placeholder="Paste or edit text here, then switch to View to analyze it."
+      ></textarea>
+    </div>
+
+    <!-- View mode: interlinear word-stack blocks, wrapping like a normal paragraph. -->
+    <div x-show="mode === 'view'">
+      <p x-show="analyzing" class="mb-4 text-sm text-slate-500">Analyzing...</p>
+
+      <div class="flex flex-wrap items-start gap-y-3 text-lg leading-relaxed" style="line-height: 2.6;">
+        <template x-for="(token, index) in tokens" :key="analysisRun + '-' + index">
+          <!-- x-for's template needs exactly one root element -- this <span> is that root; the
+               two mutually-exclusive shapes live inside it as ordinary nested x-if templates. -->
+          <span>
+            <template x-if="token.kind === 'other'">
+              <span x-text="token.text" style="white-space: pre-wrap;"></span>
+            </template>
+            <template x-if="token.kind === 'word'">
+              <span
+                x-init="tippy($el, { content: tooltipHtml(token), allowHTML: true, theme: 'light-border', delay: [150, 0] })"
+                class="mx-0.5 inline-flex cursor-help flex-col items-center rounded px-1.5 py-0.5 text-center align-top hover:bg-amber-50"
+                :class="!token.analyses || token.analyses.length === 0 ? 'opacity-50' : ''"
+              >
+                <span class="font-medium text-slate-900" x-text="token.text"></span>
+                <span class="text-[0.65rem] uppercase tracking-wide text-sky-700" x-text="morphLine(token)"></span>
+                <span class="text-xs italic text-slate-500" x-text="glossLine(token)"></span>
+              </span>
+            </template>
+          </span>
+        </template>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

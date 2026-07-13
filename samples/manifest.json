@@ -1,0 +1,10 @@
+[
+  {
+    "id": "toy",
+    "displayName": "PanGloss Toy Grammar",
+    "vernacularWs": null,
+    "hcXmlUrl": "/samples/toy-hc.xml",
+    "realizeTomlUrl": "/samples/toy-realize.toml",
+    "sampleText": "mifu kelosi boki tanu. wapa sike wapaez."
+  }
+]

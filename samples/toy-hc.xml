@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  An original, hand-built toy HermitCrab grammar for the public PanGloss demo -- not derived from
+  any real language or real FieldWorks project. Real per-project HermitCrab grammars are gitignored
+  on purpose (see ../.gitignore and the PanGloss engine repo's own samples/ policy): this file
+  exists so anyone who clones this repo, with no FieldWorks backup of their own, still sees the
+  full analyze -> gloss -> realize pipeline actually working end to end.
+-->
+<HermitCrabInput>
+  <Language>
+    <Name>PanGlossToy</Name>
+    <PartsOfSpeech>
+      <PartOfSpeech id="posN"><Name>n</Name></PartOfSpeech>
+      <PartOfSpeech id="posV"><Name>v</Name></PartOfSpeech>
+    </PartsOfSpeech>
+    <CharacterDefinitionTable id="t1">
+      <Name>Main</Name>
+      <SegmentDefinitions>
+        <SegmentDefinition id="cA"><Representations><Representation>a</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cB"><Representations><Representation>b</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cE"><Representations><Representation>e</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cF"><Representations><Representation>f</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cI"><Representations><Representation>i</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cK"><Representations><Representation>k</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cL"><Representations><Representation>l</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cM"><Representations><Representation>m</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cN"><Representations><Representation>n</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cO"><Representations><Representation>o</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cP"><Representations><Representation>p</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cS"><Representations><Representation>s</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cT"><Representations><Representation>t</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cU"><Representations><Representation>u</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cW"><Representations><Representation>w</Representation></Representations></SegmentDefinition>
+        <SegmentDefinition id="cZ"><Representations><Representation>z</Representation></Representations></SegmentDefinition>
+      </SegmentDefinitions>
+      <BoundaryDefinitions>
+        <BoundaryDefinition id="cPlus"><Representations><Representation>+</Representation></Representations></BoundaryDefinition>
+      </BoundaryDefinitions>
+    </CharacterDefinitionTable>
+    <NaturalClasses>
+      <SegmentNaturalClass id="ncAll">
+        <Name>All</Name>
+        <Segment segment="cA" /><Segment segment="cB" /><Segment segment="cE" /><Segment segment="cF" />
+        <Segment segment="cI" /><Segment segment="cK" /><Segment segment="cL" /><Segment segment="cM" />
+        <Segment segment="cN" /><Segment segment="cO" /><Segment segment="cP" /><Segment segment="cS" />
+        <Segment segment="cT" /><Segment segment="cU" /><Segment segment="cW" /><Segment segment="cZ" />
+      </SegmentNaturalClass>
+    </NaturalClasses>
+    <Strata>
+      <Stratum characterDefinitionTable="t1" morphologicalRuleOrder="unordered" morphologicalRules="mrPl mrPst">
+        <Name>S</Name>
+        <MorphologicalRuleDefinitions>
+          <MorphologicalRule id="mrPl" requiredPartsOfSpeech="posN" outputPartOfSpeech="posN">
+            <Name>plural</Name>
+            <MorphemeId>PL</MorphemeId>
+            <Gloss>pl</Gloss>
+            <MorphologicalSubrules>
+              <MorphologicalSubrule id="subPl">
+                <MorphologicalInput>
+                  <PhoneticSequence id="stem">
+                    <OptionalSegmentSequence min="1" max="-1"><SimpleContext naturalClass="ncAll" /></OptionalSegmentSequence>
+                  </PhoneticSequence>
+                </MorphologicalInput>
+                <MorphologicalOutput>
+                  <CopyFromInput index="stem" />
+                  <InsertSegments><PhoneticShape>+si</PhoneticShape></InsertSegments>
+                </MorphologicalOutput>
+              </MorphologicalSubrule>
+            </MorphologicalSubrules>
+          </MorphologicalRule>
+          <MorphologicalRule id="mrPst" requiredPartsOfSpeech="posV" outputPartOfSpeech="posV">
+            <Name>past</Name>
+            <MorphemeId>PST</MorphemeId>
+            <Gloss>pst</Gloss>
+            <MorphologicalSubrules>
+              <MorphologicalSubrule id="subPst">
+                <MorphologicalInput>
+                  <PhoneticSequence id="stem2">
+                    <OptionalSegmentSequence min="1" max="-1"><SimpleContext naturalClass="ncAll" /></OptionalSegmentSequence>
+                  </PhoneticSequence>
+                </MorphologicalInput>
+                <MorphologicalOutput>
+                  <CopyFromInput index="stem2" />
+                  <InsertSegments><PhoneticShape>+ez</PhoneticShape></InsertSegments>
+                </MorphologicalOutput>
+              </MorphologicalSubrule>
+            </MorphologicalSubrules>
+          </MorphologicalRule>
+        </MorphologicalRuleDefinitions>
+        <LexicalEntries>
+          <LexicalEntry id="eHouse" partOfSpeech="posN">
+            <Allomorphs><Allomorph id="aHouse"><PhoneticShape>mifu</PhoneticShape></Allomorph></Allomorphs>
+            <Gloss>house</Gloss>
+          </LexicalEntry>
+          <LexicalEntry id="eChild" partOfSpeech="posN">
+            <Allomorphs><Allomorph id="aChild"><PhoneticShape>kelo</PhoneticShape></Allomorph></Allomorphs>
+            <Gloss>child</Gloss>
+          </LexicalEntry>
+          <LexicalEntry id="eBook" partOfSpeech="posN">
+            <Allomorphs><Allomorph id="aBook"><PhoneticShape>boki</PhoneticShape></Allomorph></Allomorphs>
+            <Gloss>book</Gloss>
+          </LexicalEntry>
+          <LexicalEntry id="eRiver" partOfSpeech="posN">
+            <Allomorphs><Allomorph id="aRiver"><PhoneticShape>tanu</PhoneticShape></Allomorph></Allomorphs>
+            <Gloss>river</Gloss>
+          </LexicalEntry>
+          <LexicalEntry id="eWalk" partOfSpeech="posV">
+            <Allomorphs><Allomorph id="aWalk"><PhoneticShape>wapa</PhoneticShape></Allomorph></Allomorphs>
+            <Gloss>walk</Gloss>
+          </LexicalEntry>
+          <LexicalEntry id="eEat" partOfSpeech="posV">
+            <Allomorphs><Allomorph id="aEat"><PhoneticShape>sike</PhoneticShape></Allomorph></Allomorphs>
+            <Gloss>eat</Gloss>
+          </LexicalEntry>
+        </LexicalEntries>
+      </Stratum>
+    </Strata>
+  </Language>
+</HermitCrabInput>
